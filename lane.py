@@ -1,5 +1,5 @@
 from point import Point
-import random
+import random as randomGenerator
 
 class Segment:
 	def __init__(self, direction, size):
@@ -9,7 +9,6 @@ class Segment:
 	def __repr__(self):
 		return f'({self.direction}, {self.size})'
 
-
 class Lane:
 	size_x = 1;
 	size_y = 1;
@@ -18,15 +17,13 @@ class Lane:
 		self.start = Point(x1, y1)
 		self.end = Point(x2, y2)
 	
-	def normalize(self):
-		# Method is removing all Xx xX Yy yY from path
-		# This type of neibouring gens are canceling each other out
-		pass
+	@classmethod
+	def copy(cls, parent):
+		obj = cls(parent.start.x, parent.start.y, parent.end.x, parent.end.y)
+		for segment in parent.segements:
+			obj.segments.append(segment)
+		return obj
 
-	def is_outside(self, size_x, size_y):
-		# Method analizes the genes if they are outside of the given size
-		return False
-	
 	def mutate(self):
 		# Go through the entire path and determine if they should be mutated
 		# Mutation can go in two different ways
@@ -37,33 +34,34 @@ class Lane:
 		#	If a segment was deleted then a similar segment must be added somewhere
 		pass
 	
-	# FIXME: This method is created with segments of size 1
-	# @classmethod
-	# def random(cls, p1, p2, size_x, size_y):
-	# 	# Create a lane with random segments
-	# 	# Add random segments until reaching a destination or achiving maximum size
-	# 	cls.size_x = size_x
-	# 	cls.size_y = size_y
-	# 	cls.max_size = cls.size_x * cls.size_y * 0.5
-	# 	obj = cls(p1.x, p1.y, p2.x, p2.y)
-	# 	p = Point.copy(obj.start)
+	@classmethod
+	def random(cls, p1, p2, size_x, size_y, random_segments: int):
+		obj = cls(p1.x, p1.y, p2.x, p2.y)
+		point = Point.copy(p1)
+		i = 0
+		s = None
+		while i < random_segments or point == p2:
+			direction = "X" if randomGenerator.random() > 0.5 else "Y"
+			if direction == "X":
+				s = int(randomGenerator.random() * (size_x * 2)) - size_x
+			elif direction == "Y":
+				s = int(randomGenerator.random() * (size_y * 2)) - size_y
+			
+			segment = Segment(direction, s)
+			obj.segments.append(segment)
+			point.add(segment)
+			i += 1
+		
+		if point != p2:
+			s1 = Segment('X', p2.x - point.x)
+			if s1.size != 0:
+				obj.segments.append(s1)
 
-	# 	while p != obj.end:	
-	# 		# Create new object 
-	# 		p = Point.copy(obj.start)
-	# 		obj.segments = []
+			s2 = Segment('Y', p2.y - point.y)
+			if s2.size != 0:
+				obj.segments.append(s2)
 
-	# 		# First gen can be one of 4
-	# 		# Every other gen 
-	# 		last_gen = Lane.random_gen()
-	# 		p.add(last_gen)
-	# 		obj.segments.append(last_gen)
-	# 		while len(obj.segments) <= cls.max_size and p != obj.end:
-				
-	# 			last_gen = Lane.random_gen(last_gen)
-	# 			p.add(last_gen)
-	# 			obj.segments.append(last_gen)
-	# 	return obj
+		return obj
 
 	@classmethod
 	def shortest(cls, p1, p2):
@@ -77,23 +75,6 @@ class Lane:
 			obj.segments.append(s2)
 
 		return obj
-		
-	@staticmethod
-	def random_gen(last_gen=""):
-		# Returns random gen that is not opposite to the last gen
-		# Example: If last_gen=="x" the method will return only "y" or "Y" or "x"
-		pop = []
-		if last_gen != "x":
-			pop.append("X")
-		if last_gen != "X":
-			pop.append("x")
-		if last_gen != "y":
-			pop.append("Y")
-		if last_gen != "Y":
-			pop.append("y")
-		return random.choice(pop)
-
-	max_size = 0
-
+	
 	def __repr__(self):
 	 return "\n" + str(self.segments)

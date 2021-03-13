@@ -10,18 +10,19 @@ class Subject:
 		self.size_y = size_y
 
 	@classmethod
-	def crossover(cls, parent1, parent2):
+	def crossover(cls, parent1: object, parent2: object):
 		# Return new subject that is a crossover of two other subjects
 		pass
 
 	@classmethod
-	def copy(cls, parent):
-		# Return new subject that is a copy of another subject
-		pass
-	
+	def copy(cls, parent: object) -> object:
+		obj = cls(parent.size_x, parent.size_y)
+		for lane in parent.lane:
+			obj.lanes.append(lane.copy())
+		return obj	
 
 	@classmethod
-	def shortest(cls, points, size_x, size_y):
+	def shortest(cls, points: [object], size_x: int, size_y: int) -> object:
 		obj = cls(size_x, size_y)
 		i = 0
 		while i < len(points):
@@ -30,11 +31,11 @@ class Subject:
 		return obj
 		
 
-	def mutate(self, probability):
+	def mutate(self, probability: float):
 		# Mutate each gen with some probability
 		pass
 	
-	def fitness(self, weights):
+	def fitness(self, weights: [int]) -> int:
 		# Scores
 		# 0. Number of crosses
 		# 1. Size of lanes
@@ -80,13 +81,11 @@ class Subject:
 	def __repr__(self):
 	 	return str(self.lanes)
 	
-	# FIXME: This is old version
-	# @classmethod
-	# def random(cls, points, size_x, size_y):
-	# 	# Create subject with random lanes
-	# 	obj = cls()
-	# 	i = 0
-	# 	while i < len(points):
-	# 		obj.lanes.append(Lane.random(points[i], points[i + 1], size_x, size_y))
-	# 		i += 2
-	# 	return obj
+	@classmethod
+	def random(cls, points, size_x, size_y, ):
+		obj = cls()
+		i = 0
+		while i < len(points):
+			obj.lanes.append(Lane.random(points[i], points[i + 1], size_x, size_y))
+			i += 2
+		return obj

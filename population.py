@@ -20,8 +20,10 @@ class Population:
 
 	@classmethod
 	def copy(cls, parent):
-		# IDK if this is needed but still could be usefull
-		pass
+		obj = cls()
+		for subject in parent.subjects:
+			obj.subjects.append(Subject.copy(subject))
+		return obj
 
 	def estimate(self, weights):
 		for subject in self.subjects:
