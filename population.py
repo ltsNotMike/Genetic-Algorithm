@@ -28,3 +28,16 @@ class Population:
 	def estimate(self, weights):
 		for subject in self.subjects:
 			print(subject.fitness(weights))
+
+	def test(self):
+		print("\n ---- TESTS ----")
+		passed = True
+		for subject in self.subjects:
+			print(subject)
+			if not subject.test():
+				passed = False
+				break
+		if passed:
+			print("Tests passed")
+		else:
+			print("CAUTION: Tests failed")

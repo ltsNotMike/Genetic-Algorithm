@@ -32,52 +32,69 @@ class Subject:
 		
 
 	def mutate(self, probability: float):
-		# Mutate each gen with some probability
-		pass
+		# TODO: Now every lane is being mutated and it should not
+		for lane in self.lanes:
+			lane.mutate_simple()
 	
-	def fitness(self, weights: [int]) -> int:
+	def fitness(self, weights: list) -> int:
+
 		# Scores
 		# 0. Number of crosses
 		# 1. Size of lanes
-		# 2. Number of lanes
+		# 2. Number of segments
 		# 3. Number of lanes outside  
-		scores = [0, 0, 0, 0]
+		number_of_crossings = 0
+		length_of_lanes = 0
+		number_of_segments = 0
+		number_of_lanes_outside = 0
+		
 		visited_points = []
 
 		# Every lane on this solution of the board
 		for lane in self.lanes:
 			p = Point(lane.start.x, lane.start.y)
 			if p in visited_points:
-				scores[0] += 1
+				number_of_crossings += 1
 			else:
 				visited_points.append(Point.copy(p))
 
-			# Analaze every segement of the lane
-			for segement in lane.segments:
-				scores[1] += abs(segement.size)
-				scores[2] += 1
+			# Analaze every segment of the lane
+			for segment in lane.segments:
+				length_of_lanes += abs(segment.size)
+				number_of_segments += 1
 				
 				# Get every point on the way of this segment
-				for i in range(abs(segement.size)):
+				for i in range(abs(segment.size)):
 					# Change point 
-					if segement.size < 0:
-						p.add(Segment(segement.direction, -1))
+					if segment.size < 0:
+						p.add(Segment(segment.direction, -1))
 					else: 
-						p.add(Segment(segement.direction, 1))
+						p.add(Segment(segment.direction, 1))
 
 					# Update score of crosses if the point was visited
 					if p in visited_points:
-						scores[0] += 1
+						number_of_crossings += 1
 					else:
 						visited_points.append(Point.copy(p))
 
 				# Update score of outside segmets if point is outside 
 				if p.x < 0 or p.x > self.size_x or p.y < 0 or p.y > self.size_y:
-					scores[3] += 1
+					number_of_lanes_outside += 1
 					
-		scores = np.multiply(scores, weights)
+		scores = np.multiply([
+			number_of_crossings,
+			length_of_lanes,
+			number_of_segments,
+			number_of_lanes_outside
+		], weights)
 		return np.sum(scores)
 	
+	def test(self):
+		for lane in self.lanes:
+			if not lane.test():
+				return False
+		return True
+
 	def __repr__(self):
 	 	return str(self.lanes)
 	

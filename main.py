@@ -26,6 +26,9 @@ def main():
 
 	print(pop.subjects)
 	pop.estimate(sol.weights)
+
+	pop.subjects[0].mutate(0.1)
+	pop.test()
 	pass
 
 if __name__ == "__main__":
