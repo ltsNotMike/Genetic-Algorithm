@@ -1,5 +1,6 @@
 from lane import Lane, Segment
 from point import Point
+from random import randint, random as randfloat
 import numpy as np
 
 class Subject:
@@ -8,11 +9,6 @@ class Subject:
 		self.lanes = []
 		self.size_x = size_x
 		self.size_y = size_y
-
-	@classmethod
-	def crossover(cls, parent1: object, parent2: object):
-		# Return new subject that is a crossover of two other subjects
-		pass
 
 	@classmethod
 	def copy(cls, parent: object) -> object:
@@ -31,11 +27,9 @@ class Subject:
 		return obj
 		
 
-	def mutate(self, probability: float):
-		# TODO: Only one lane should be mutated
-		# Because of the entropy
-		for lane in self.lanes:
-			lane.mutate_complex()
+	def mutate(self) -> None:
+		lane_index = randint(0, len(self.lanes) - 1)
+		self.lanes[lane_index].mutate_complex()
 	
 	def fitness(self, weights: list) -> int:
 
@@ -90,6 +84,17 @@ class Subject:
 		], weights)
 		return np.sum(scores)
 	
+	@classmethod
+	def crossover(cls, mother: "Subject", father: "Subject", gen_ratio: float) -> "Subject":
+		""" Return new subject that is a crossover of mother and father genes\n
+			gen_ratio is a number [0,1] it defines the propability of inheriting gen from father\n"""
+
+		obj = Subject(mother.size_x, mother.size_y)
+		for gen_index in range(len(mother.lanes)):
+			gen = Lane.copy(mother.lanes[gen_index] if randfloat() >= gen_ratio else father.lanes[gen_index])
+			obj.lanes.append(gen)
+		return obj
+
 	def test(self):
 		for lane in self.lanes:
 			if not lane.test():
@@ -97,7 +102,10 @@ class Subject:
 		return True
 
 	def __repr__(self):
-	 	return str(self.lanes)
+		res = "Subject:\n"
+		for lane in self.lanes:
+			res += str(lane)
+		return res
 	
 	@classmethod
 	def random(cls, points, size_x, size_y, ):

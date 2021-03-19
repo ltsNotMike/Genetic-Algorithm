@@ -1,15 +1,16 @@
 from point import Point
 import random as randomGenerator
+from math import floor
 
-def sign(x: int):
+def sign(x: int) -> int:
 	return 0 if x >= 0 else 1
 
 class Segment:
-	def __init__(self, direction, size):
+	def __init__(self, direction: str, size: int):
 		self.direction = direction # X or Y
 		self.size = size  # Signed Int
 
-	def __repr__(self):
+	def __repr__(self) -> str:
 		return f'({self.direction}, {self.size})'
 
 class Lane:
@@ -21,20 +22,14 @@ class Lane:
 		self.end = Point(x2, y2)
 	
 	@classmethod
-	def copy(cls, parent): # Type pre define 
+	def copy(cls, parent: "Lane") -> "Lane": # Type pre define 
 		obj = cls(parent.start.x, parent.start.y, parent.end.x, parent.end.y)
 		for segment in parent.segments:
 			obj.segments.append(segment)
 		return obj
 
-	def mutate_simple(self, segment_index):
-		# Select which way it should be moved
-		# Change length of previous segment
-		# Change length of following segment
-		# If previous or following segment doesnt exist it should be added
-
-		# Direction of segment movement
-		# It can be either 1 or -1
+	def mutate_simple(self, segment_index: int) -> None:
+		
 		phrase = -1 if randomGenerator.random() < 0.5 else 1
 		direction = 'X' if self.segments[segment_index].direction == 'Y' else 'Y'
 
@@ -53,17 +48,55 @@ class Lane:
 		
 
 	def mutate_complex(self) -> None:
-		# Select one segment that is going to be mutated
-		# Select at what offset it will break
-		# Break the selected segment into two
-		# Select which part will be moved
-		# Perform simple_mutation on the part 
-		
-		segment_index = randomGenerator.randint(0, len(self.segments) - 1)
+		# TODO: This method doesnt yet have a breaking and choosing of the segment
+		""" Method selects one segment, breaks it in two segments\n
+			New segments have sizes [0, size of parent segment]\n
+			One of those segments then gets mutated """
 
-		self.mutate_simple(segment_index)
+		segment_index = randomGenerator.randint(0, len(self.segments) - 1)
+		is_previous = randomGenerator.random() < 0.5
+
+		# Benford's law distribution
+		# Its more likely that smaller number is choosen
+		size_new_segment = pow(abs(self.segments[segment_index].size), randomGenerator.random())
+		# Size has to be an integer
+		size_new_segment = floor(size_new_segment)
+		# Size has to be the same sign as parent
+		size_new_segment *= -1 if sign(self.segments[segment_index].size) else 1
+
+		if size_new_segment == self.segments[segment_index].size:
+			# No division needed, the whole segment is being moved
+			self.mutate_simple(segment_index)
+		else:
+			new_segment_direction = self.segments[segment_index].direction
+			self.segments[segment_index].size -= size_new_segment
+			self.segments.insert(segment_index, Segment(new_segment_direction, size_new_segment))
+			if is_previous:
+				# The first part of the segment will be mutated
+				self.mutate_simple(segment_index)
+			else:
+				# The second part of the segment will be mutated
+				self.mutate_simple(segment_index + 1)
+
+		self.normalize()
+
+	def normalize(self):
+		i = 0
+		while i < len(self.segments) - 1:
+			# If two segments are going the same way
+			if sign(self.segments[i].size) == sign(self.segments[i + 1].size) and self.segments[i].direction == self.segments[i + 1].direction:
+				# Concat the two
+				self.segments[i].size += self.segments[i + 1].size
+				self.segments.pop(i + 1)
+				i -= 1
+			elif self.segments[i].size == 0:
+				# Delete this one
+				self.segments.pop(i)
+				i -= 1
+			i += 1
 
 	def test(self) -> bool:
+		""" Test if the lane connects the start and the end """
 		correct_value = [self.end.x - self.start.x, self.end.y - self.start.y]
 		value = [0, 0]
 		for segment in self.segments:
@@ -71,11 +104,12 @@ class Lane:
 				value[0] += segment.size
 			else:
 				value[1] += segment.size
-		
 		return value == correct_value
 
 	@classmethod
-	def random(cls, p1: Point, p2: Point, size_x: int, size_y: int, random_segments: int):
+	def random(cls, p1: Point, p2: Point, size_x: int, size_y: int, random_segments: int) -> "Lane":
+		""" Methed creates new lane with specified number of random segments\n
+			New object will have the maximum of (random_segments + 2) number of segments """
 		obj = cls(p1.x, p1.y, p2.x, p2.y)
 		point = Point.copy(p1)
 		i = 0
@@ -117,6 +151,6 @@ class Lane:
 		return obj
 	
 	def __repr__(self):
-	 return "\n" + str(self.segments)
+	 return f"{self.segments}\n"
 
 	

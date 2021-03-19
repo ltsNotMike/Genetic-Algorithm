@@ -1,5 +1,6 @@
 from solution import Solution
 from population import Population
+from subject import Subject
 from point import Point
 
 def main():
@@ -20,17 +21,20 @@ def main():
 	# 		mutate(new_subject, MUTATION_PROBABILITY)
 	# 	iteration_index++
 
-	sol = Solution.from_file("./data/test/zad2.txt", 1, [1, 1, 1, 1])
+	sol = Solution.from_file("./data/test/zad2.txt", 2, [1, 1, 1, 1])
 
 	pop = Population.shortest(sol.population_size, sol.points, sol.size_x, sol.size_y)
+	pop.subjects[0].mutate()
+	pop.subjects[0].mutate()
+	pop.subjects[0].mutate()
+	pop.subjects[0].mutate()
+	pop.subjects[1].mutate()
+	pop.subjects[1].mutate()
+	pop.subjects[1].mutate()
+	pop.subjects[1].mutate()
 
-	print(pop.subjects)
-	pop.estimate(sol.weights)
-
-	for i in range(10):
-		pop.subjects[0].mutate(0.1)
-		if not pop.test():
-			break
+	print(pop)
+	print(Subject.crossover(pop.subjects[0], pop.subjects[1], 0.5))
 	
 
 if __name__ == "__main__":
