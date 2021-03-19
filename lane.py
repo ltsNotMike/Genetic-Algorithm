@@ -15,77 +15,53 @@ class Segment:
 class Lane:
 	size_x = 1;
 	size_y = 1;
-	def __init__(self, x1, y1, x2, y2):
+	def __init__(self, x1: int, y1: int, x2: int, y2: int):
 		self.segments = []
 		self.start = Point(x1, y1)
 		self.end = Point(x2, y2)
 	
 	@classmethod
-	def copy(cls, parent):
+	def copy(cls, parent): # Type pre define 
 		obj = cls(parent.start.x, parent.start.y, parent.end.x, parent.end.y)
-		for segment in parent.segements:
+		for segment in parent.segments:
 			obj.segments.append(segment)
 		return obj
 
-	def mutate_simple(self):
-		# Select one segment
+	def mutate_simple(self, segment_index):
 		# Select which way it should be moved
 		# Change length of previous segment
 		# Change length of following segment
 		# If previous or following segment doesnt exist it should be added
 
-		# Index of segment that will be moved
-		index = randomGenerator.randint(0, len(self.segments) - 1)
 		# Direction of segment movement
 		# It can be either 1 or -1
 		phrase = -1 if randomGenerator.random() < 0.5 else 1
-		direction = 'X' if self.segments[index].direction == 'Y' else 'Y'
+		direction = 'X' if self.segments[segment_index].direction == 'Y' else 'Y'
 
-		# U-Case
-		# There are end points on both side of the segment
-		# Or previous and following segments are oposite
-		# |   |     __     .__.
-		# |___| or |  | or 
-		if len(self.segments) == 1 or (index != 0 and index != len(self.segments) - 1 and sign(self.segments[index - 1].size) != sign(self.segments[index + 1].size)):
-			if len(self.segments) == 1:
-				# Insert two new segments
-				self.segments.insert(0, Segment(direction, phrase))
-				self.segments.insert(2, Segment(direction, -phrase))
-			else:
-				# Modify following segment
-				self.segments[index - 1].size += phrase
-				# Modify proevious segment but in oposite way
-				self.segments[index + 1].size -= phrase
-				
-		# S-Case
-		# There is an end point on either side of the segment
-		# Or the previos and following segments are not oposite
-		#  __|      |__        .__           |
-		# |     or     |   or     |   or  .__|
+		if segment_index == 0 or self.segments[segment_index - 1].direction == self.segments[segment_index].direction:
+			self.segments.insert(segment_index, Segment(direction, phrase))
+			segment_index += 1
 		else:
-			if index == 0:
-				self.segments[index + 1].size -= phrase
-				self.segments.insert(0, Segment(direction, phrase))
-			elif index == len(self.segments) - 1:
-				self.segments[index - 1].size += phrase
-				self.segments.insert(index + 1, Segment(direction, -phrase))
-			else:
-				self.segments[index - 1].size += phrase
-				self.segments[index + 1].size -= phrase
+			self.segments[segment_index - 1].size += phrase 
 
-
-
-
+		if segment_index == len(self.segments) - 1 or self.segments[segment_index + 1].direction == self.segments[segment_index].direction:
+			self.segments.insert(segment_index + 1, Segment(direction, -phrase))
+		else:
+			self.segments[segment_index + 1].size -= phrase
+		
+		# Watchout for adding new segments and len(self.segments)
 		
 
-	def mutate_complex(self):
-		# Select one segment
-		# Select the part of it that should be mutated
-		# If the part is == size then simple_mutate
-		# Else
-		# Select what is the offset
-		# ...
-		pass
+	def mutate_complex(self) -> None:
+		# Select one segment that is going to be mutated
+		# Select at what offset it will break
+		# Break the selected segment into two
+		# Select which part will be moved
+		# Perform simple_mutation on the part 
+		
+		segment_index = randomGenerator.randint(0, len(self.segments) - 1)
+
+		self.mutate_simple(segment_index)
 
 	def test(self) -> bool:
 		correct_value = [self.end.x - self.start.x, self.end.y - self.start.y]
@@ -97,9 +73,9 @@ class Lane:
 				value[1] += segment.size
 		
 		return value == correct_value
-		
+
 	@classmethod
-	def random(cls, p1, p2, size_x, size_y, random_segments: int):
+	def random(cls, p1: Point, p2: Point, size_x: int, size_y: int, random_segments: int):
 		obj = cls(p1.x, p1.y, p2.x, p2.y)
 		point = Point.copy(p1)
 		i = 0

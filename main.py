@@ -20,16 +20,18 @@ def main():
 	# 		mutate(new_subject, MUTATION_PROBABILITY)
 	# 	iteration_index++
 
-	sol = Solution.from_file("data.txt", 1, [1, 1, 1, 1])
+	sol = Solution.from_file("./data/test/zad2.txt", 1, [1, 1, 1, 1])
 
 	pop = Population.shortest(sol.population_size, sol.points, sol.size_x, sol.size_y)
 
 	print(pop.subjects)
 	pop.estimate(sol.weights)
 
-	pop.subjects[0].mutate(0.1)
-	pop.test()
-	pass
+	for i in range(10):
+		pop.subjects[0].mutate(0.1)
+		if not pop.test():
+			break
+	
 
 if __name__ == "__main__":
     main()

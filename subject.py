@@ -32,9 +32,10 @@ class Subject:
 		
 
 	def mutate(self, probability: float):
-		# TODO: Now every lane is being mutated and it should not
+		# TODO: Only one lane should be mutated
+		# Because of the entropy
 		for lane in self.lanes:
-			lane.mutate_simple()
+			lane.mutate_complex()
 	
 	def fitness(self, weights: list) -> int:
 
