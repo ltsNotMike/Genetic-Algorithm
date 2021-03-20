@@ -25,7 +25,7 @@ class Population:
 			obj.scores.append(0)
 		return obj
 
-	def estimate(self, weights):
+	def evaluate(self, weights):
 		for i in range(len(self.subjects)):
 			self.scores[i] = self.subjects[i].fitness(weights)
 
@@ -74,4 +74,7 @@ class Population:
 		for i in range(len(self.subjects)):
 			res += f"{i} {self.subjects[i]}"
 		return res
-		
+	
+	def showBest(self):
+		index = self.scores.index(max(self.scores))
+		print(f"Best subject\n {self.subjects[index]}")

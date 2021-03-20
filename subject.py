@@ -13,8 +13,8 @@ class Subject:
 	@classmethod
 	def copy(cls, parent: object) -> object:
 		obj = cls(parent.size_x, parent.size_y)
-		for lane in parent.lane:
-			obj.lanes.append(lane.copy())
+		for lane in parent.lanes:
+			obj.lanes.append(Lane.copy(lane))
 		return obj	
 
 	@classmethod
