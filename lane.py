@@ -12,6 +12,10 @@ class Segment:
 
 	def __repr__(self) -> str:
 		return f'({self.direction}, {self.size})'
+	
+	@classmethod
+	def copy(cls, parent):
+		return cls(parent.direction, parent.size)
 
 class Lane:
 	size_x = 1;
@@ -25,7 +29,7 @@ class Lane:
 	def copy(cls, parent: "Lane") -> "Lane": # Type pre define 
 		obj = cls(parent.start.x, parent.start.y, parent.end.x, parent.end.y)
 		for segment in parent.segments:
-			obj.segments.append(segment)
+			obj.segments.append(Segment.copy(segment))
 		return obj
 
 	def mutate_simple(self, segment_index: int) -> None:

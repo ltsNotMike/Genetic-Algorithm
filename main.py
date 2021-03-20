@@ -8,17 +8,17 @@ def main():
 	CROSSING_PROPABILITY = 0.6
 	CROSSING_RATIO_PROPABILITY = 0.5
 	MUTATION_PROPABILITY = 0.1
+	ITERATIONS = 100
+	POPULATION_SIZE = 100
 
-	iterations = 100
 	iteration = 0
-	population_size = 100
-	sol = Solution.from_file("./data/test/zad3.txt", 5, [20, 2, 1, 20])
+	sol = Solution.from_file("./data/test/zad0.txt", POPULATION_SIZE, [20, 2, 1, 20])
 
-	prev_pop = Population.shortest(population_size, sol.points, sol.size_x, sol.size_y)
+	prev_pop = Population.shortest(sol.population_size, sol.points, sol.size_x, sol.size_y)
 	prev_pop.evaluate(sol.weights)
 	next_pop = Population()
 
-	while iteration < iterations:
+	while iteration < ITERATIONS:
 		while len(next_pop.subjects) < sol.population_size:
 			subject_1 = prev_pop.subjects[prev_pop.selectRoulette()]
 			if random() < CROSSING_PROPABILITY:
