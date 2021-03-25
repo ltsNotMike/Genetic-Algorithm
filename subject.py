@@ -108,10 +108,10 @@ class Subject:
 		return res
 	
 	@classmethod
-	def random(cls, points, size_x, size_y, ):
-		obj = cls()
+	def random(cls, points, size_x, size_y, random_segments):
+		obj = cls(size_x, size_y)
 		i = 0
 		while i < len(points):
-			obj.lanes.append(Lane.random(points[i], points[i + 1], size_x, size_y))
+			obj.lanes.append(Lane.random(points[i], points[i + 1], size_x, size_y, randint(0, random_segments)))
 			i += 2
 		return obj

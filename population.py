@@ -10,10 +10,10 @@ class Population:
 		pass
 
 	@classmethod
-	def random(cls, population_size, points, size_x, size_y):
+	def random(cls, population_size, points, size_x, size_y, random_segments):
 		obj = cls()
 		for i in range(population_size):
-			obj.subjects.append(Subject.random(points, size_x, size_y))
+			obj.subjects.append(Subject.random(points, size_x, size_y, random_segments))
 			obj.scores.append(0)
 		return obj
 	
@@ -75,6 +75,6 @@ class Population:
 			res += f"{i} {self.subjects[i]}"
 		return res
 	
-	def showBest(self):
-		index = self.scores.index(max(self.scores))
-		print(f"Best subject\n {self.subjects[index]}")
+	def best(self):
+		return self.scores.index(min(self.scores))
+		

@@ -13,15 +13,16 @@ class Solution:
 	def population_size(self):
 		return self.__size_pop
 
-	def __init__(self, x, y, points, population_size, weights):
+	def __init__(self, x, y, points, population_size, weights, random_segments=0):
 		self.__size_x = x
 		self.__size_y = y
 		self.__size_pop = population_size
 		self.points = points
 		self.weights = weights
+		self.random_segments = random_segments
 
 	@classmethod
-	def from_file(cls, file_name, population_size, weights):
+	def from_file(cls, file_name, population_size, weights, random_segments):
 		obj = None
 		with open(file_name, "r", encoding="utf-8") as file:
 			values = file.readline().split(';')
@@ -32,7 +33,7 @@ class Solution:
 				values = line.split(';')
 				points.append(Point(int(values[0]), int(values[1])))
 				points.append(Point(int(values[2]), int(values[3])))
-			obj = cls(size_x, size_y, points, population_size, weights)
+			obj = cls(size_x, size_y, points, population_size, weights, random_segments)
 			file.close()
 
 		return obj
