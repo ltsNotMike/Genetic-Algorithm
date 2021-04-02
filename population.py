@@ -29,9 +29,18 @@ class Population:
 		for i in range(len(self.subjects)):
 			self.scores[i] = self.subjects[i].fitness(weights)
 
+	def getAverageFitness(self) -> float:
+		return np.average(self.scores)
+
+	def getBestFitness(self) -> float:
+		return np.min(self.scores)
+
+	def getWorstFitness(self) -> float:
+		return np.max(self.scores)
+
 	def selectTournament(self, tournament_size: float) -> int:
 		""" Returns index of the selected subject\n
-			Tournament is number [0,1) it reprezents percentage of population """
+			Tournament is number (0,1] it reprezents percentage of population """
 
 		number_subjects = floor(len(self.subjects) * tournament_size)
 		tournament = []
